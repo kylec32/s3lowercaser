@@ -1,0 +1,45 @@
+service: s3objectlowercaser
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: us-west-2
+  environment:
+    FAILURE_QUEUE_NAME:
+      Fn::GetAtt:
+        - FailedLowerCasingObject
+        - QueueName
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "sqs:GetQueueUrl"
+        - "sqs:SendMessage"
+      Resource:
+        Fn::GetAtt:
+          - FailedLowerCasingObject
+          - Arn
+    - Effect: "Allow"
+      Action:
+        - "s3:GetObjcet"
+        - "s3:PutObject"
+        - "s3:DeleteObjectVersion"
+      Resource: 
+        - "arn:aws:s3:::*-test-*"
+        - "arn:aws:s3:::*-dev-*"
+        - "arn:aws:s3:::*-prod-*"
+        - "arn:aws:s3:::*-training-*"
+
+functions:
+  lowercaser:
+    handler: handler.lambda_handler
+
+resources:
+  Resources:
+    FailedLowerCasingObject:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: FailedLowerCasingObjects
+        VisibilityTimeout: 30
+        KmsMasterKeyId: "alias/aws/sqs"
+        MessageRetentionPeriod: 1209600
+
