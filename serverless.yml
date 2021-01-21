@@ -20,18 +20,18 @@ provider:
           - Arn
     - Effect: "Allow"
       Action:
-        - "s3:GetObjcet"
+        - "s3:GetObject"
         - "s3:PutObject"
         - "s3:DeleteObjectVersion"
+        - "s3:GetObjectTagging"
+        - "s3:PutObjectTagging"
       Resource: 
-        - "arn:aws:s3:::*-test-*"
-        - "arn:aws:s3:::*-dev-*"
-        - "arn:aws:s3:::*-prod-*"
-        - "arn:aws:s3:::*-training-*"
+        - "arn:aws:s3:::lowercaseitalltester/*"
 
 functions:
   lowercaser:
     handler: handler.lambda_handler
+    timeout: 600
 
 resources:
   Resources:
